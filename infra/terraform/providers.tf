@@ -8,7 +8,7 @@ terraform {
   required_version = ">= 1.0"
 
   cloud {
-    organization = "your-org-name"
+    organization = "nizam"
     workspaces {
       name = "fullstack-devops-dev"
     }

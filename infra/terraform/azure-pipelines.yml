@@ -10,40 +10,89 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- group: terraform-variables  # Create this variable group in Azure DevOps
+- group: terraform-variables
 
 stages:
-- stage: 'Terraform'
-  displayName: 'Terraform Infrastructure Deployment'
+- stage: 'Validate'
+  displayName: 'Validate'
   jobs:
-  - job: 'Terraform'
-    displayName: 'Terraform'
+  - job: 'Validate'
+    displayName: 'Validate Terraform'
+    steps:
+    - task: TerraformInstaller@1
+      displayName: 'Install Terraform'
+      inputs:
+        terraformVersion: 'latest'
+
+    - task: TerraformCLI@1
+      displayName: 'Terraform Init'
+      inputs:
+        command: 'init'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+        backendType: 'remote'
+        backendServiceArm: 'terraform-cloud-service-connection'
+
+    - task: TerraformCLI@1
+      displayName: 'Terraform Format'
+      inputs:
+        command: 'fmt'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+
+    - task: TerraformCLI@1
+      displayName: 'Terraform Validate'
+      inputs:
+        command: 'validate'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+
+- stage: 'Plan'
+  displayName: 'Plan'
+  dependsOn: 'Validate'
+  jobs:
+  - job: 'Plan'
+    displayName: 'Terraform Plan'
     steps:
     - task: TerraformInstaller@1
       inputs:
         terraformVersion: 'latest'
-    
-    - task: TerraformTaskV4@4
+
+    - task: TerraformCLI@1
       inputs:
-        provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-        backendServiceArm: 'Azure-Service-Connection'  # Create this service connection in Azure DevOps
-        backendAzureRmResourceGroupName: '$(RESOURCE_GROUP_NAME)'
-        backendAzureRmStorageAccountName: '$(STORAGE_ACCOUNT_NAME)'
-        backendAzureRmContainerName: '$(CONTAINER_NAME)'
-        backendAzureRmKey: 'terraform.tfstate'
-    
-    - task: TerraformTaskV4@4
+        backendType: 'remote'
+        backendServiceArm: 'terraform-cloud-service-connection'
+
+    - task: TerraformCLI@1
       inputs:
-        provider: 'azurerm'
         command: 'plan'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
         environmentServiceNameAzureRM: 'Azure-Service-Connection'
-    
-    - task: TerraformTaskV4@4
-      inputs:
-        provider: 'azurerm'
-        command: 'apply'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-        environmentServiceNameAzureRM: 'Azure-Service-Connection'
+
+- stage: 'Apply'
+  displayName: 'Apply'
+  dependsOn: 'Plan'
+  condition: succeeded()
+  jobs:
+  - deployment: 'Apply'
+    displayName: 'Terraform Apply'
+    environment: 'development'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformCLI@1
+            inputs:
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+              backendType: 'remote'
+              backendServiceArm: 'terraform-cloud-service-connection'
+
+          - task: TerraformCLI@1
+            inputs:
+              command: 'apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+              environmentServiceNameAzureRM: 'Azure-Service-Connection'
