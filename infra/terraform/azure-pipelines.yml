@@ -20,26 +20,26 @@ stages:
     displayName: 'Validate Terraform'
     steps:
     - task: TerraformInstaller@1
-      displayName: 'Install Terraform'
       inputs:
         terraformVersion: 'latest'
 
     - task: TerraformCLI@1
-      displayName: 'Terraform Init'
       inputs:
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        ARM_TENANT_ID: $(AZURE_TENANT_ID)
+        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
     - task: TerraformCLI@1
-      displayName: 'Terraform Format'
       inputs:
         command: 'fmt'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
 
     - task: TerraformCLI@1
-      displayName: 'Terraform Validate'
       inputs:
         command: 'validate'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
@@ -59,14 +59,24 @@ stages:
       inputs:
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-        backendType: 'remote'
-        backendServiceArm: 'terraform-cloud-service-connection'
+      env:
+        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        ARM_TENANT_ID: $(AZURE_TENANT_ID)
+        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
     - task: TerraformCLI@1
       inputs:
         command: 'plan'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
         environmentServiceNameAzureRM: 'Azure-Service-Connection'
+      env:
+        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        ARM_TENANT_ID: $(AZURE_TENANT_ID)
+        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
 - stage: 'Apply'
   displayName: 'Apply'
@@ -99,7 +109,7 @@ stages:
             inputs:
               command: 'apply'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-              commandOptions: '-auto-approve'
+              environmentServiceNameAzureRM: 'Azure-Service-Connection'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -110,7 +120,7 @@ stages:
 - stage: 'Destroy'
   displayName: 'Destroy Infrastructure'
   condition: eq(variables['TERRAFORM_DESTROY'], 'true')
-  dependsOn: []  # Remove dependencies so it can run independently
+  dependsOn: []
   jobs:
   - deployment: 'Destroy'
     displayName: 'Terraform Destroy'
@@ -138,7 +148,7 @@ stages:
             inputs:
               command: 'destroy'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-              commandOptions: '-auto-approve'
+              environmentServiceNameAzureRM: 'Azure-Service-Connection'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
