@@ -24,11 +24,10 @@ stages:
       inputs:
         terraformVersion: 'latest'
 
-    - task: TerraformTaskV4@4
+    - script: |
+        terraform init
       displayName: 'Terraform Init'
-      inputs:
-        command: 'init'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
         ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -36,17 +35,15 @@ stages:
         ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
         ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
-    - task: TerraformTaskV4@4
+    - script: |
+        terraform fmt -check
       displayName: 'Terraform Format'
-      inputs:
-        command: 'fmt'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
 
-    - task: TerraformTaskV4@4
+    - script: |
+        terraform validate
       displayName: 'Terraform Validate'
-      inputs:
-        command: 'validate'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
 
 - stage: 'Plan'
   displayName: 'Plan'
@@ -60,11 +57,10 @@ stages:
       inputs:
         terraformVersion: 'latest'
 
-    - task: TerraformTaskV4@4
+    - script: |
+        terraform init
       displayName: 'Terraform Init'
-      inputs:
-        command: 'init'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
         ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -72,12 +68,10 @@ stages:
         ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
         ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
-    - task: TerraformTaskV4@4
+    - script: |
+        terraform plan
       displayName: 'Terraform Plan'
-      inputs:
-        command: 'plan'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-        environmentServiceNameAzureRM: 'Azure-Service-Connection'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
         ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -102,11 +96,10 @@ stages:
             inputs:
               terraformVersion: 'latest'
 
-          - task: TerraformTaskV4@4
+          - script: |
+              terraform init
             displayName: 'Terraform Init'
-            inputs:
-              command: 'init'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -114,12 +107,10 @@ stages:
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
-          - task: TerraformTaskV4@4
+          - script: |
+              terraform apply -auto-approve
             displayName: 'Terraform Apply'
-            inputs:
-              command: 'apply'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-              environmentServiceNameAzureRM: 'Azure-Service-Connection'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -144,11 +135,10 @@ stages:
             inputs:
               terraformVersion: 'latest'
 
-          - task: TerraformTaskV4@4
+          - script: |
+              terraform init
             displayName: 'Terraform Init'
-            inputs:
-              command: 'init'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -156,12 +146,10 @@ stages:
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
-          - task: TerraformTaskV4@4
+          - script: |
+              terraform destroy -auto-approve
             displayName: 'Terraform Destroy'
-            inputs:
-              command: 'destroy'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-              environmentServiceNameAzureRM: 'Azure-Service-Connection'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
