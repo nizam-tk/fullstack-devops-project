@@ -30,6 +30,8 @@ stages:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+        backendServiceArm: 'Azure-Service-Connection'
+        backendType: 'azurerm'
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
         ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -69,6 +71,8 @@ stages:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+        backendServiceArm: 'Azure-Service-Connection'
+        backendType: 'azurerm'
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
         ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -113,6 +117,8 @@ stages:
               provider: 'azurerm'
               command: 'init'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+              backendServiceArm: 'Azure-Service-Connection'
+              backendType: 'azurerm'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -157,6 +163,8 @@ stages:
               provider: 'azurerm'
               command: 'init'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+              backendServiceArm: 'Azure-Service-Connection'
+              backendType: 'azurerm'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
