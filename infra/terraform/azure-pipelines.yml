@@ -106,3 +106,42 @@ stages:
               ARM_TENANT_ID: $(AZURE_TENANT_ID)
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+
+- stage: 'Destroy'
+  displayName: 'Destroy Infrastructure'
+  condition: eq(variables['TERRAFORM_DESTROY'], 'true')
+  dependsOn: []  # Remove dependencies so it can run independently
+  jobs:
+  - deployment: 'Destroy'
+    displayName: 'Terraform Destroy'
+    environment: 'development'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: TerraformInstaller@1
+            inputs:
+              terraformVersion: 'latest'
+
+          - task: TerraformCLI@1
+            inputs:
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+            env:
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+
+          - task: TerraformCLI@1
+            inputs:
+              command: 'destroy'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+              commandOptions: '-auto-approve'
+            env:
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
