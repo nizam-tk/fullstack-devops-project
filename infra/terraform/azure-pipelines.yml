@@ -29,8 +29,8 @@ stages:
       inputs:
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-        backendType: 'remote'
-        backendServiceArm: 'terraform-cloud-service-connection'
+      env:
+        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
 
     - task: TerraformCLI@1
       displayName: 'Terraform Format'
@@ -88,11 +88,21 @@ stages:
             inputs:
               command: 'init'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-              backendType: 'remote'
-              backendServiceArm: 'terraform-cloud-service-connection'
+            env:
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
           - task: TerraformCLI@1
             inputs:
               command: 'apply'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-              environmentServiceNameAzureRM: 'Azure-Service-Connection'
+              commandOptions: '-auto-approve'
+            env:
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
