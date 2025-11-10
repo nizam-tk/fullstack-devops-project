@@ -13,29 +13,64 @@ variables:
 - group: terraform-variables
 
 stages:
-- stage: 'Validate'
-  displayName: 'Validate'
+- stage: Validate
   jobs:
-  - job: 'Validate'
-    displayName: 'Validate Terraform'
+  - job: ValidateAndPlan
     steps:
     - task: TerraformInstaller@0
-      displayName: 'Install Terraform'
       inputs:
         terraformVersion: 'latest'
 
     - task: TerraformTaskV4@4
-      displayName: 'Terraform Init'
       inputs:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
-        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-        ARM_TENANT_ID: $(AZURE_TENANT_ID)
         ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
         ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        ARM_TENANT_ID: $(AZURE_TENANT_ID)
+        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+
+    - task: TerraformTaskV4@4
+      inputs:
+        provider: 'azurerm'
+        command: 'validate'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+
+    - task: TerraformTaskV4@4
+      inputs:
+        provider: 'azurerm'
+        command: 'plan'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+      env:
+        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        ARM_TENANT_ID: $(AZURE_TENANT_ID)
+        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+
+- stage: Apply
+  condition: succeeded()
+  jobs:
+  - deployment: Deploy
+    environment: development
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+            env:
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
 
     - task: TerraformTaskV4@4
       displayName: 'Terraform Format'
