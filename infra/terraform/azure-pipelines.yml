@@ -13,73 +13,38 @@ variables:
 - group: terraform-variables
 
 stages:
-- stage: Validate
+- stage: 'Validate'
+  displayName: 'Validate'
   jobs:
-  - job: ValidateAndPlan
+  - job: 'Validate'
+    displayName: 'Validate Terraform'
     steps:
-    - task: TerraformInstaller@0
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+      displayName: 'Install Terraform'
       inputs:
         terraformVersion: 'latest'
 
-    - task: TerraformTaskV4@4
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
+      displayName: 'Terraform Init'
       inputs:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
-        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
         ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
         ARM_TENANT_ID: $(AZURE_TENANT_ID)
-        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-
-    - task: TerraformTaskV4@4
-      inputs:
-        provider: 'azurerm'
-        command: 'validate'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-
-    - task: TerraformTaskV4@4
-      inputs:
-        provider: 'azurerm'
-        command: 'plan'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-      env:
         ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
         ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
-        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-        ARM_TENANT_ID: $(AZURE_TENANT_ID)
-        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
 
-- stage: Apply
-  condition: succeeded()
-  jobs:
-  - deployment: Deploy
-    environment: development
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: TerraformTaskV4@4
-            inputs:
-              provider: 'azurerm'
-              command: 'apply'
-              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-            env:
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-
-    - task: TerraformTaskV4@4
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
       displayName: 'Terraform Format'
       inputs:
         provider: 'azurerm'
         command: 'fmt'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
 
-    - task: TerraformTaskV4@4
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
       displayName: 'Terraform Validate'
       inputs:
         provider: 'azurerm'
@@ -93,12 +58,12 @@ stages:
   - job: 'Plan'
     displayName: 'Terraform Plan'
     steps:
-    - task: TerraformInstaller@0
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
       displayName: 'Install Terraform'
       inputs:
         terraformVersion: 'latest'
 
-    - task: TerraformTaskV4@4
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
       displayName: 'Terraform Init'
       inputs:
         provider: 'azurerm'
@@ -111,7 +76,7 @@ stages:
         ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
         ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
-    - task: TerraformTaskV4@4
+    - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
       displayName: 'Terraform Plan'
       inputs:
         provider: 'azurerm'
@@ -137,12 +102,12 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: TerraformInstaller@0
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
             displayName: 'Install Terraform'
             inputs:
               terraformVersion: 'latest'
 
-          - task: TerraformTaskV4@4
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
             displayName: 'Terraform Init'
             inputs:
               provider: 'azurerm'
@@ -155,7 +120,7 @@ stages:
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
-          - task: TerraformTaskV4@4
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
             displayName: 'Terraform Apply'
             inputs:
               provider: 'azurerm'
@@ -181,12 +146,12 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: TerraformInstaller@0
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
             displayName: 'Install Terraform'
             inputs:
               terraformVersion: 'latest'
 
-          - task: TerraformTaskV4@4
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
             displayName: 'Terraform Init'
             inputs:
               provider: 'azurerm'
@@ -199,7 +164,7 @@ stages:
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
-          - task: TerraformTaskV4@4
+          - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV4@4
             displayName: 'Terraform Destroy'
             inputs:
               provider: 'azurerm'
