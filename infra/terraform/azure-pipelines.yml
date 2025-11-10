@@ -27,7 +27,6 @@ stages:
     - task: TerraformTaskV4@4
       displayName: 'Terraform Init'
       inputs:
-        provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
@@ -40,14 +39,12 @@ stages:
     - task: TerraformTaskV4@4
       displayName: 'Terraform Format'
       inputs:
-        provider: 'azurerm'
         command: 'fmt'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
 
     - task: TerraformTaskV4@4
       displayName: 'Terraform Validate'
       inputs:
-        provider: 'azurerm'
         command: 'validate'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
 
@@ -66,7 +63,6 @@ stages:
     - task: TerraformTaskV4@4
       displayName: 'Terraform Init'
       inputs:
-        provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
@@ -79,7 +75,6 @@ stages:
     - task: TerraformTaskV4@4
       displayName: 'Terraform Plan'
       inputs:
-        provider: 'azurerm'
         command: 'plan'
         workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
         environmentServiceNameAzureRM: 'Azure-Service-Connection'
@@ -110,7 +105,6 @@ stages:
           - task: TerraformTaskV4@4
             displayName: 'Terraform Init'
             inputs:
-              provider: 'azurerm'
               command: 'init'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
@@ -123,7 +117,6 @@ stages:
           - task: TerraformTaskV4@4
             displayName: 'Terraform Apply'
             inputs:
-              provider: 'azurerm'
               command: 'apply'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
               environmentServiceNameAzureRM: 'Azure-Service-Connection'
@@ -154,7 +147,6 @@ stages:
           - task: TerraformTaskV4@4
             displayName: 'Terraform Init'
             inputs:
-              provider: 'azurerm'
               command: 'init'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
@@ -167,7 +159,6 @@ stages:
           - task: TerraformTaskV4@4
             displayName: 'Terraform Destroy'
             inputs:
-              provider: 'azurerm'
               command: 'destroy'
               workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
               environmentServiceNameAzureRM: 'Azure-Service-Connection'
