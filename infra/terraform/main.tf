@@ -33,8 +33,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   default_node_pool {
     name            = "default"
-    node_count      = 1              # Reduced to 1 node for learning/dev
-    vm_size         = "Standard_B2s" # Changed to B-series for cost optimization
+    node_count      = var.node_count
+    vm_size         = var.node_vm_size
     max_pods        = 30
     os_disk_size_gb = 30 # Reduced disk size
   }
