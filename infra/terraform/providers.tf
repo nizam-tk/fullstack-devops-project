@@ -22,12 +22,6 @@ provider "azurerm" {
     }
   }
 
-  # Force service principal authentication and disable all other methods
-  use_cli                = false
-  use_msi                = false
-  use_oidc               = false
-
-  # Use service principal authentication with environment variables
+  # Authentication will use environment variables:
   # ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID
-  # These are set in the Azure DevOps pipeline from variable groups
 }

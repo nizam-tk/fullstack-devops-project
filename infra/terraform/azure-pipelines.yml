@@ -58,64 +58,6 @@ stages:
         terraformVersion: 'latest'
 
     - script: |
-        echo "=== Terraform Init with Service Principal Authentication ==="
-        echo "=== Debugging Azure DevOps Variables ==="
-        echo "AZURE_SUBSCRIPTION_ID from ADO: $(AZURE_SUBSCRIPTION_ID)"
-        echo "AZURE_TENANT_ID from ADO: $(AZURE_TENANT_ID)" 
-        echo "AZURE_CLIENT_ID from ADO: $(AZURE_CLIENT_ID)"
-        echo "AZURE_CLIENT_SECRET length: ${#AZURE_CLIENT_SECRET}"
-        echo ""
-        echo "=== Checking ARM Environment Variables ==="
-        echo "ARM_SUBSCRIPTION_ID: ${ARM_SUBSCRIPTION_ID:-NOT_SET}"
-        echo "ARM_TENANT_ID: ${ARM_TENANT_ID:-NOT_SET}"
-        echo "ARM_CLIENT_ID: ${ARM_CLIENT_ID:-NOT_SET}"
-        echo "ARM_CLIENT_SECRET length: ${#ARM_CLIENT_SECRET}"
-        echo ""
-        echo "=== Validating Required Environment Variables ==="
-        if [ -z "$ARM_CLIENT_ID" ]; then
-          echo "ERROR: ARM_CLIENT_ID is not set"
-          exit 1
-        fi
-        if [ -z "$ARM_CLIENT_SECRET" ]; then
-          echo "ERROR: ARM_CLIENT_SECRET is not set"  
-          exit 1
-        fi
-        if [ -z "$ARM_SUBSCRIPTION_ID" ]; then
-          echo "ERROR: ARM_SUBSCRIPTION_ID is not set"
-          exit 1
-        fi
-        if [ -z "$ARM_TENANT_ID" ]; then
-          echo "ERROR: ARM_TENANT_ID is not set"
-          exit 1
-        fi
-        echo "✓ All required ARM environment variables are set"
-        echo ""
-        echo "=== Testing Azure Authentication ==="
-        # Test if we can authenticate using these credentials
-        cat > test_auth.tf << EOF
-        terraform {
-          required_providers {
-            azurerm = {
-              source  = "hashicorp/azurerm"
-              version = "~> 3.0"
-            }
-          }
-        }
-        provider "azurerm" {
-          features {}
-          use_cli  = false
-          use_msi  = false
-          use_oidc = false
-        }
-        data "azurerm_client_config" "current" {}
-        output "subscription_id" { value = data.azurerm_client_config.current.subscription_id }
-        output "tenant_id" { value = data.azurerm_client_config.current.tenant_id }
-        EOF
-        terraform init -backend=false
-        terraform plan -target=data.azurerm_client_config.current || echo "Authentication test failed"
-        rm -f test_auth.tf
-        echo ""
-        echo "=== Starting Main Terraform Init ==="
         terraform init
       displayName: 'Terraform Init'
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
@@ -127,29 +69,6 @@ stages:
         ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
     - script: |
-        echo "=== Terraform Plan with Service Principal Authentication ==="
-        echo "Verifying environment variables..."
-        if [ -z "$ARM_CLIENT_ID" ]; then
-          echo "ERROR: ARM_CLIENT_ID is not set"
-          exit 1
-        fi
-        if [ -z "$ARM_CLIENT_SECRET" ]; then
-          echo "ERROR: ARM_CLIENT_SECRET is not set"  
-          exit 1
-        fi
-        if [ -z "$ARM_SUBSCRIPTION_ID" ]; then
-          echo "ERROR: ARM_SUBSCRIPTION_ID is not set"
-          exit 1
-        fi
-        if [ -z "$ARM_TENANT_ID" ]; then
-          echo "ERROR: ARM_TENANT_ID is not set"
-          exit 1
-        fi
-        echo "✓ All required ARM environment variables are verified"
-        echo "ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID"
-        echo "ARM_TENANT_ID: $ARM_TENANT_ID"
-        echo "ARM_CLIENT_ID: $ARM_CLIENT_ID"
-        echo "Running Terraform Plan..."
         terraform plan
       displayName: 'Terraform Plan'
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
@@ -180,33 +99,19 @@ stages:
               terraformVersion: 'latest'
 
           - script: |
-              echo "=== Terraform Init and Apply with Service Principal Authentication ==="
-              echo "Checking environment variables..."
-              if [ -z "$ARM_CLIENT_ID" ]; then
-                echo "ERROR: ARM_CLIENT_ID is not set"
-                exit 1
-              fi
-              if [ -z "$ARM_CLIENT_SECRET" ]; then
-                echo "ERROR: ARM_CLIENT_SECRET is not set"  
-                exit 1
-              fi
-              if [ -z "$ARM_SUBSCRIPTION_ID" ]; then
-                echo "ERROR: ARM_SUBSCRIPTION_ID is not set"
-                exit 1
-              fi
-              if [ -z "$ARM_TENANT_ID" ]; then
-                echo "ERROR: ARM_TENANT_ID is not set"
-                exit 1
-              fi
-              echo "✓ All required ARM environment variables are present"
-              echo "ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID"
-              echo "ARM_TENANT_ID: $ARM_TENANT_ID"
-              echo "ARM_CLIENT_ID: $ARM_CLIENT_ID"
-              echo "Running Terraform Init..."
               terraform init
-              echo "Running Terraform Apply..."
+            displayName: 'Terraform Init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+            env:
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+
+          - script: |
               terraform apply -auto-approve
-            displayName: 'Terraform Init and Apply'
+            displayName: 'Terraform Apply'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
@@ -235,33 +140,19 @@ stages:
               terraformVersion: 'latest'
 
           - script: |
-              echo "=== Terraform Init and Destroy with Service Principal Authentication ==="
-              echo "Verifying environment variables..."
-              if [ -z "$ARM_CLIENT_ID" ]; then
-                echo "ERROR: ARM_CLIENT_ID is not set"
-                exit 1
-              fi
-              if [ -z "$ARM_CLIENT_SECRET" ]; then
-                echo "ERROR: ARM_CLIENT_SECRET is not set"  
-                exit 1
-              fi
-              if [ -z "$ARM_SUBSCRIPTION_ID" ]; then
-                echo "ERROR: ARM_SUBSCRIPTION_ID is not set"
-                exit 1
-              fi
-              if [ -z "$ARM_TENANT_ID" ]; then
-                echo "ERROR: ARM_TENANT_ID is not set"
-                exit 1
-              fi
-              echo "✓ All required ARM environment variables are confirmed"
-              echo "ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID"
-              echo "ARM_TENANT_ID: $ARM_TENANT_ID"
-              echo "ARM_CLIENT_ID: $ARM_CLIENT_ID"
-              echo "Running Terraform Init..."
               terraform init
-              echo "Running Terraform Destroy..."
+            displayName: 'Terraform Init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+            env:
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              ARM_TENANT_ID: $(AZURE_TENANT_ID)
+              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
+              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+
+          - script: |
               terraform destroy -auto-approve
-            displayName: 'Terraform Init and Destroy'
+            displayName: 'Terraform Destroy'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
