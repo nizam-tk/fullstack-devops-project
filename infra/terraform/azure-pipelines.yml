@@ -58,6 +58,12 @@ stages:
         terraformVersion: 'latest'
 
     - script: |
+        echo "Debugging environment variables..."
+        echo "ARM_SUBSCRIPTION_ID is set: $([[ -n "$ARM_SUBSCRIPTION_ID" ]] && echo "Yes" || echo "No")"
+        echo "ARM_TENANT_ID is set: $([[ -n "$ARM_TENANT_ID" ]] && echo "Yes" || echo "No")"
+        echo "ARM_CLIENT_ID is set: $([[ -n "$ARM_CLIENT_ID" ]] && echo "Yes" || echo "No")"
+        echo "ARM_CLIENT_SECRET is set: $([[ -n "$ARM_CLIENT_SECRET" ]] && echo "Yes" || echo "No")"
+        echo "Starting Terraform Init..."
         terraform init
       displayName: 'Terraform Init'
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
@@ -69,6 +75,11 @@ stages:
         ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
     - script: |
+        echo "Running Terraform Plan with environment variables..."
+        echo "ARM_SUBSCRIPTION_ID is set: $([[ -n "$ARM_SUBSCRIPTION_ID" ]] && echo "Yes" || echo "No")"
+        echo "ARM_TENANT_ID is set: $([[ -n "$ARM_TENANT_ID" ]] && echo "Yes" || echo "No")"
+        echo "ARM_CLIENT_ID is set: $([[ -n "$ARM_CLIENT_ID" ]] && echo "Yes" || echo "No")"
+        echo "ARM_CLIENT_SECRET is set: $([[ -n "$ARM_CLIENT_SECRET" ]] && echo "Yes" || echo "No")"
         terraform plan
       displayName: 'Terraform Plan'
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
