@@ -78,11 +78,6 @@ stages:
         TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
         TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
         TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
-        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-        ARM_TENANT_ID: $(AZURE_TENANT_ID)
-        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
 - stage: 'Apply'
   displayName: 'Apply'
@@ -124,10 +119,6 @@ stages:
               TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
               TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
               TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
-            env:
-              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
               ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
@@ -171,9 +162,3 @@ stages:
               TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
               TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
               TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
-            env:
-              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
