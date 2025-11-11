@@ -36,28 +36,27 @@ variable "acr_name" {
   type        = string
 }
 
-# These variables are declared to avoid warnings from Terraform Cloud
-# but are not used since we use ARM_* environment variables instead
-variable "AZURE_CLIENT_ID" {
-  description = "Azure Service Principal Client ID (unused - using ARM_CLIENT_ID env var)"
+# Authentication variables for Azure Provider
+variable "azure_client_id" {
+  description = "Azure Service Principal Client ID"
   type        = string
-  default     = ""
+  sensitive   = true
 }
 
-variable "AZURE_CLIENT_SECRET" {
-  description = "Azure Service Principal Client Secret (unused - using ARM_CLIENT_SECRET env var)"
+variable "azure_client_secret" {
+  description = "Azure Service Principal Client Secret"
   type        = string
-  default     = ""
+  sensitive   = true
 }
 
-variable "AZURE_TENANT_ID" {
-  description = "Azure Tenant ID (unused - using ARM_TENANT_ID env var)"
+variable "azure_tenant_id" {
+  description = "Azure Tenant ID"
   type        = string
-  default     = ""
+  sensitive   = true
 }
 
-variable "AZURE_SUBSCRIPTION_ID" {
-  description = "Azure Subscription ID (unused - using ARM_SUBSCRIPTION_ID env var)"
+variable "azure_subscription_id" {
+  description = "Azure Subscription ID"
   type        = string
-  default     = ""
+  sensitive   = true
 }
