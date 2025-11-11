@@ -28,7 +28,7 @@ variable "node_count" {
 variable "node_vm_size" {
   description = "Size of the node VMs"
   type        = string
-  default     = "Standard_B2s"
+  default     = "Standard_DC2s_v3"
 }
 
 variable "acr_name" {
