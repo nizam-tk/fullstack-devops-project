@@ -6,6 +6,12 @@ trigger:
     include:
     - infra/terraform/*
 
+parameters:
+- name: destroyInfrastructure
+  displayName: 'Destroy Infrastructure?'
+  type: boolean
+  default: false
+
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -124,7 +130,7 @@ stages:
 
 - stage: 'Destroy'
   displayName: 'Destroy Infrastructure'
-  condition: eq(variables['TERRAFORM_DESTROY'], 'true')
+  condition: eq('${{ parameters.destroyInfrastructure }}', 'true')
   dependsOn: []
   jobs:
   - deployment: 'Destroy'
