@@ -57,38 +57,46 @@ stages:
       inputs:
         terraformVersion: 'latest'
 
-    - script: |
-        echo "Debugging environment variables..."
-        echo "ARM_SUBSCRIPTION_ID is set: $([[ -n "$ARM_SUBSCRIPTION_ID" ]] && echo "Yes" || echo "No")"
-        echo "ARM_TENANT_ID is set: $([[ -n "$ARM_TENANT_ID" ]] && echo "Yes" || echo "No")"
-        echo "ARM_CLIENT_ID is set: $([[ -n "$ARM_CLIENT_ID" ]] && echo "Yes" || echo "No")"
-        echo "ARM_CLIENT_SECRET is set: $([[ -n "$ARM_CLIENT_SECRET" ]] && echo "Yes" || echo "No")"
-        echo "Starting Terraform Init..."
-        terraform init
+    - task: AzureCLI@2
       displayName: 'Terraform Init'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+      inputs:
+        azureSubscription: 'terraform-service-connection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+        inlineScript: |
+          echo "Using Azure CLI authentication..."
+          echo "Current Azure account:"
+          az account show
+          export ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+          export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
+          echo "ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID"
+          echo "ARM_TENANT_ID: $ARM_TENANT_ID"
+          echo "Starting Terraform Init..."
+          terraform init
+        addSpnToEnvironment: true
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-        ARM_TENANT_ID: $(AZURE_TENANT_ID)
-        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
-    - script: |
-        echo "Running Terraform Plan with environment variables..."
-        echo "ARM_SUBSCRIPTION_ID is set: $([[ -n "$ARM_SUBSCRIPTION_ID" ]] && echo "Yes" || echo "No")"
-        echo "ARM_TENANT_ID is set: $([[ -n "$ARM_TENANT_ID" ]] && echo "Yes" || echo "No")"
-        echo "ARM_CLIENT_ID is set: $([[ -n "$ARM_CLIENT_ID" ]] && echo "Yes" || echo "No")"
-        echo "ARM_CLIENT_SECRET is set: $([[ -n "$ARM_CLIENT_SECRET" ]] && echo "Yes" || echo "No")"
-        terraform plan
+    - task: AzureCLI@2
       displayName: 'Terraform Plan'
-      workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+      inputs:
+        azureSubscription: 'terraform-service-connection'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+        inlineScript: |
+          echo "Running Terraform Plan with Azure CLI authentication..."
+          echo "Current Azure account:"
+          az account show
+          export ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+          export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
+          echo "ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID"
+          echo "ARM_TENANT_ID: $ARM_TENANT_ID"
+          terraform plan
+        addSpnToEnvironment: true
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-        ARM_TENANT_ID: $(AZURE_TENANT_ID)
-        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
 - stage: 'Apply'
   displayName: 'Apply'
@@ -109,27 +117,28 @@ stages:
             inputs:
               terraformVersion: 'latest'
 
-          - script: |
-              terraform init
-            displayName: 'Terraform Init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+          - task: AzureCLI@2
+            displayName: 'Terraform Init and Apply'
+            inputs:
+              azureSubscription: 'terraform-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+              inlineScript: |
+                echo "Using Azure CLI authentication for Apply..."
+                echo "Current Azure account:"
+                az account show
+                export ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+                export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
+                echo "ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID"
+                echo "ARM_TENANT_ID: $ARM_TENANT_ID"
+                echo "Running Terraform Init..."
+                terraform init
+                echo "Running Terraform Apply..."
+                terraform apply -auto-approve
+              addSpnToEnvironment: true
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
-
-          - script: |
-              terraform apply -auto-approve
-            displayName: 'Terraform Apply'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-            env:
-              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
 - stage: 'Destroy'
   displayName: 'Destroy Infrastructure'
@@ -150,24 +159,26 @@ stages:
             inputs:
               terraformVersion: 'latest'
 
-          - script: |
-              terraform init
-            displayName: 'Terraform Init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+          - task: AzureCLI@2
+            displayName: 'Terraform Init and Destroy'
+            inputs:
+              azureSubscription: 'terraform-service-connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+              inlineScript: |
+                echo "Using Azure CLI authentication for Destroy..."
+                echo "Current Azure account:"
+                az account show
+                export ARM_SUBSCRIPTION_ID=$(az account show --query id --output tsv)
+                export ARM_TENANT_ID=$(az account show --query tenantId --output tsv)
+                echo "ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID"
+                echo "ARM_TENANT_ID: $ARM_TENANT_ID"
+                echo "Running Terraform Init..."
+                terraform init
+                echo "Running Terraform Destroy..."
+                terraform destroy -auto-approve
+              addSpnToEnvironment: true
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
-
-          - script: |
-              terraform destroy -auto-approve
-            displayName: 'Terraform Destroy'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
-            env:
-              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
