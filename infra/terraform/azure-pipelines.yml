@@ -69,7 +69,11 @@ stages:
         ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
     - script: |
-        terraform plan
+        terraform plan \
+          -var="azure_client_id=$(AZURE_CLIENT_ID)" \
+          -var="azure_client_secret=$(AZURE_CLIENT_SECRET)" \
+          -var="azure_tenant_id=$(AZURE_TENANT_ID)" \
+          -var="azure_subscription_id=$(AZURE_SUBSCRIPTION_ID)"
       displayName: 'Terraform Plan'
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
@@ -108,7 +112,11 @@ stages:
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
           - script: |
-              terraform apply -auto-approve
+              terraform apply -auto-approve \
+                -var="azure_client_id=$(AZURE_CLIENT_ID)" \
+                -var="azure_client_secret=$(AZURE_CLIENT_SECRET)" \
+                -var="azure_tenant_id=$(AZURE_TENANT_ID)" \
+                -var="azure_subscription_id=$(AZURE_SUBSCRIPTION_ID)"
             displayName: 'Terraform Apply'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
@@ -147,7 +155,11 @@ stages:
               ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
 
           - script: |
-              terraform destroy -auto-approve
+              terraform destroy -auto-approve \
+                -var="azure_client_id=$(AZURE_CLIENT_ID)" \
+                -var="azure_client_secret=$(AZURE_CLIENT_SECRET)" \
+                -var="azure_tenant_id=$(AZURE_TENANT_ID)" \
+                -var="azure_subscription_id=$(AZURE_SUBSCRIPTION_ID)"
             displayName: 'Terraform Destroy'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
