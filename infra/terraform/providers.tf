@@ -22,9 +22,6 @@ provider "azurerm" {
     }
   }
 
-  # Use service principal authentication
-  client_id       = var.azure_client_id
-  client_secret   = var.azure_client_secret
-  tenant_id       = var.azure_tenant_id
-  subscription_id = var.azure_subscription_id
+  # Authentication will use environment variables:
+  # ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID
 }
