@@ -22,6 +22,9 @@ provider "azurerm" {
     }
   }
 
+  # Explicitly disable Azure CLI to prevent fallback authentication
+  use_cli = false
+
   # Authentication will use environment variables:
   # ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID
 }

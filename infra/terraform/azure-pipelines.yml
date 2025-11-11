@@ -58,6 +58,11 @@ stages:
         terraformVersion: 'latest'
 
     - script: |
+        echo "Checking ARM environment variables..."
+        echo "ARM_SUBSCRIPTION_ID: ${ARM_SUBSCRIPTION_ID:-NOT_SET}"
+        echo "ARM_TENANT_ID: ${ARM_TENANT_ID:-NOT_SET}"
+        echo "ARM_CLIENT_ID: ${ARM_CLIENT_ID:-NOT_SET}"
+        echo "ARM_CLIENT_SECRET is $([ -n "$ARM_CLIENT_SECRET" ] && echo "SET" || echo "NOT_SET")"
         terraform init
       displayName: 'Terraform Init'
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
