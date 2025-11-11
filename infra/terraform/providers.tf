@@ -22,6 +22,7 @@ provider "azurerm" {
     }
   }
 
-  # Allow Azure CLI authentication for Azure DevOps pipelines
-  # Will use service principal authentication via AzureCLI task
+  # Use service principal authentication with environment variables
+  # ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID
+  # These are set in the Azure DevOps pipeline from variable groups
 }
