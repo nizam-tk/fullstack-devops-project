@@ -30,10 +30,10 @@ stages:
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-        ARM_TENANT_ID: $(AZURE_TENANT_ID)
-        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        TF_VAR_azure_subscription_id: $(AZURE_SUBSCRIPTION_ID)
+        TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
+        TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
+        TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
 
     - script: |
         terraform fmt
@@ -58,26 +58,26 @@ stages:
         terraformVersion: 'latest'
 
     - script: |
-        echo "Checking ARM environment variables..."
-        echo "ARM_SUBSCRIPTION_ID: ${ARM_SUBSCRIPTION_ID:-NOT_SET}"
-        echo "ARM_TENANT_ID: ${ARM_TENANT_ID:-NOT_SET}"
-        echo "ARM_CLIENT_ID: ${ARM_CLIENT_ID:-NOT_SET}"
-        echo "ARM_CLIENT_SECRET is $([ -n "$ARM_CLIENT_SECRET" ] && echo "SET" || echo "NOT_SET")"
         terraform init
       displayName: 'Terraform Init'
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-        ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-        ARM_TENANT_ID: $(AZURE_TENANT_ID)
-        ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-        ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        TF_VAR_azure_subscription_id: $(AZURE_SUBSCRIPTION_ID)
+        TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
+        TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
+        TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
 
     - script: |
         terraform plan
       displayName: 'Terraform Plan'
       workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
       env:
+        TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+        TF_VAR_azure_subscription_id: $(AZURE_SUBSCRIPTION_ID)
+        TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
+        TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
+        TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
         TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
         ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
         ARM_TENANT_ID: $(AZURE_TENANT_ID)
@@ -109,15 +109,21 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+              TF_VAR_azure_subscription_id: $(AZURE_SUBSCRIPTION_ID)
+              TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
+              TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
+              TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
 
           - script: |
               terraform apply -auto-approve
             displayName: 'Terraform Apply'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+            env:
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+              TF_VAR_azure_subscription_id: $(AZURE_SUBSCRIPTION_ID)
+              TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
+              TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
+              TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
@@ -150,15 +156,21 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
-              ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
-              ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              ARM_CLIENT_ID: $(AZURE_CLIENT_ID)
-              ARM_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+              TF_VAR_azure_subscription_id: $(AZURE_SUBSCRIPTION_ID)
+              TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
+              TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
+              TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
 
           - script: |
               terraform destroy -auto-approve
             displayName: 'Terraform Destroy'
             workingDirectory: '$(System.DefaultWorkingDirectory)/infra/terraform'
+            env:
+              TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
+              TF_VAR_azure_subscription_id: $(AZURE_SUBSCRIPTION_ID)
+              TF_VAR_azure_tenant_id: $(AZURE_TENANT_ID)
+              TF_VAR_azure_client_id: $(AZURE_CLIENT_ID)
+              TF_VAR_azure_client_secret: $(AZURE_CLIENT_SECRET)
             env:
               TF_TOKEN_app_terraform_io: $(TF_API_TOKEN)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
