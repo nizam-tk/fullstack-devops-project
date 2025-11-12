@@ -31,11 +31,6 @@ variable "node_vm_size" {
   default     = "Standard_DC2s_v3"
 }
 
-variable "acr_name" {
-  description = "Name of the Azure Container Registry"
-  type        = string
-}
-
 # Authentication variables for Azure Provider
 variable "azure_client_id" {
   description = "Azure Service Principal Client ID"

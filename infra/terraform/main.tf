@@ -9,19 +9,8 @@ resource "azurerm_resource_group" "rg" {
   }
 }
 
-# Create Azure Container Registry
-resource "azurerm_container_registry" "acr" {
-  name                = var.acr_name
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  sku                 = "Basic" # Changed to Basic SKU for cost savings
-  admin_enabled       = false
-
-  tags = {
-    environment = "development"
-    application = "fullstack-devops"
-  }
-}
+# Note: Using Docker Hub for container images instead of Azure Container Registry
+# Docker Hub credentials should be configured as Kubernetes secrets when deploying applications
 
 # Create AKS Cluster
 resource "azurerm_kubernetes_cluster" "aks" {
