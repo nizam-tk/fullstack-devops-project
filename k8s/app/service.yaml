@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fullstack-app-service
+  namespace: default
+  labels:
+    app: fullstack-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: fullstack-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+    name: http

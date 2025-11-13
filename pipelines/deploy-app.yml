@@ -1,0 +1,53 @@
+trigger: none
+
+parameters:
+- name: dockerImage
+  displayName: 'Docker Image (e.g., username/image:tag)'
+  type: string
+  default: ''
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: Deploy
+  displayName: 'Deploy Application to AKS'
+  jobs:
+  - job: DeployToKubernetes
+    displayName: 'Deploy to Kubernetes'
+    steps:
+    - task: replacetokens@5
+      displayName: 'Replace Docker Image Token'
+      inputs:
+        rootDirectory: '$(System.DefaultWorkingDirectory)/k8s/app'
+        targetFiles: '**/*.yaml'
+        encoding: 'auto'
+        tokenPattern: 'custom'
+        tokenPrefix: '__'
+        tokenSuffix: '__'
+        actionOnMissing: 'fail'
+        keepToken: false
+        actionOnNoFiles: 'fail'
+        enableTelemetry: true
+        variables: |
+          DOCKER_IMAGE=$(dockerImage)
+    
+    - task: KubernetesManifest@0
+      displayName: 'Create Docker Hub Secret'
+      inputs:
+        action: 'createSecret'
+        secretType: 'dockerRegistry'
+        secretName: 'dockerhub-secret'
+        dockerRegistryEndpoint: '$(dockerHubServiceConnection)'
+        kubernetesServiceConnection: '$(aksServiceConnection)'
+        namespace: 'default'
+    
+    - task: KubernetesManifest@0
+      displayName: 'Deploy to AKS'
+      inputs:
+        action: 'deploy'
+        kubernetesServiceConnection: '$(aksServiceConnection)'
+        namespace: 'default'
+        manifests: |
+          $(System.DefaultWorkingDirectory)/k8s/app/deployment.yaml
+          $(System.DefaultWorkingDirectory)/k8s/app/service.yaml
